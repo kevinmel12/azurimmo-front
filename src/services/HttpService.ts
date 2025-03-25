@@ -6,7 +6,20 @@ export  default class HttpService{
         const response=await fetch(url);
         return await response.json();
     }
-    
+
+    static static async request(method:string, url:string,data:any,headers?: any){
+        const rHeaders={...headers,'Content-Type':'application/json'};
+        const response=await fetch(url,{
+            method,
+            headers:rHeaders,
+            body:JSON.stringify(data)});
+        return await response.json();
+    }
+
+    static async post(url:string,data:any,headers?: any){
+
+    }
+
     static async post(url:string,data:any,headers?: any){
         const rHeaders={...headers,'Content-Type':'application/json'};
         const response=await fetch(url,{
@@ -17,7 +30,9 @@ export  default class HttpService{
     }
 
     static async delete(url:string){
-        const response=await fetch(url,{method:'DELETE'});
+        const response=await fetch(url,{
+            method:'DELETE'
+        });
         return await response.json();
     }
 }

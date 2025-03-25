@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import {Layout} from "antd";
 import {Content, Footer, Header} from "antd/lib/layout/layout";
+import '@ant-design/v5-patch-for-react-19';
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,11 +32,11 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
       <Layout>
-          <Header><h1 className={"text-white"}>Arurimmo</h1></Header>
+          <Header><h1 className={"text-white"}>Azurimmo</h1></Header>
           <Content className={"p-8 height-full"}>
             {children}
           </Content>
-          <Footer>Arurimmo ©2021 Created by Arurimmo</Footer>
+          <Footer>Azurimmo ©2021 Created by Azurimmo</Footer>
       </Layout>
       </body>
     </html>
