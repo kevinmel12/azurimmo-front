@@ -14,6 +14,32 @@ import API_URL from "@/constants/ApiUrl";
 export default function BatimentComponent({...props}:{batiments:Batiment[]}) {
     const [batiments, setBatiments] = useState<Batiment[]>(props.batiments);
     const [showAddDialog, setShowAddDialog] = useState<boolean>(false);
+    const [currentBatiment, setCurrentBatiment] = useState<Batiment | null>(null);
+
+    const editBatiment = (batiment: Batiment) => {
+        setCurrentBatiment(batiment);
+        setShowAddDialog(true);
+    }
+
+    const saveBatiment = (batiment: Batiment) => {
+        if (batiment.id) {
+            HttpService.post(`${API_URL.batiments}${batiment.id}`, batiment)
+                .then(response => {
+                    setBatiments(batiments.map(item =>
+                    item.id === batiment.id ? response : item
+                    ));
+                    setShowAddDialog(false);
+                    setCurrentBatiment(null);
+                    message.success("Bâtiment mis à jour avec succès");
+                })
+            .catch(error => {
+                console.log("Erreur lors de la mise à jour:", error);
+                message.error('Erreur lors de la mise à jour du bâtiment');
+            });
+        } else {
+            updateBatiment(batiment);
+        }
+    };
 
     const updateBatiment=(batiment:Batiment)=> {
         HttpService.post(API_URL.batiments,batiment).then((response)=>{
@@ -63,7 +89,7 @@ export default function BatimentComponent({...props}:{batiments:Batiment[]}) {
             render:(text:string,record:Batiment)=>(
                 <>
                     <Button shape={"circle"} onClick={() => {
-                        console.log('Édition du bâtiment:', record);
+                        editBatiment(record);
                     }}><EditOutlined /></Button>
 
                     <Button shape={"circle"} onClick={() => {
@@ -80,9 +106,14 @@ export default function BatimentComponent({...props}:{batiments:Batiment[]}) {
             <Button onClick={()=>{
                 setShowAddDialog(true);
             }}>Ajouter...</Button><br/>
-            {showAddDialog && <AddBatimentComponent batiment={new Batiment()}
-                                                    onClose={setShowAddDialog}
-                                                    onSubmit={updateBatiment}
+            {showAddDialog &&
+                <AddBatimentComponent
+                    batiment={currentBatiment || new Batiment()}
+                    onClose={() => {
+                        setShowAddDialog(false);
+                        setCurrentBatiment(null);
+                    }}
+                    onSubmit={saveBatiment}
             />}
             <Link href={"/"}><Button>Retour à l'accueil</Button></Link>
             {!showAddDialog && <>
