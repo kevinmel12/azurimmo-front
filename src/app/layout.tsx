@@ -1,9 +1,9 @@
+import '@ant-design/v5-patch-for-react-19';
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import {Layout} from "antd";
 import {Content, Footer, Header} from "antd/lib/layout/layout";
-import '@ant-design/v5-patch-for-react-19';
 
 
 const geistSans = Geist({

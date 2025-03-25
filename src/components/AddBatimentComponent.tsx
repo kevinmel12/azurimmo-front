@@ -1,6 +1,8 @@
 import Batiment from "@/models/Batiment";
 import {Button, Divider, Form, Input} from "antd";
 import {useState} from "react";
+import '@ant-design/v5-patch-for-react-19';
+
 import HttpService from "@/services/HttpService";
 import API_URL from "@/constants/ApiUrl";
 

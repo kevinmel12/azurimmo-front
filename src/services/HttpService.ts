@@ -7,18 +7,15 @@ export  default class HttpService{
         return await response.json();
     }
 
-    static static async request(method:string, url:string,data:any,headers?: any){
+    /*static static async request(method:string, url:string,data:any,headers?: any){
         const rHeaders={...headers,'Content-Type':'application/json'};
         const response=await fetch(url,{
             method,
             headers:rHeaders,
             body:JSON.stringify(data)});
         return await response.json();
-    }
+    }*/
 
-    static async post(url:string,data:any,headers?: any){
-
-    }
 
     static async post(url:string,data:any,headers?: any){
         const rHeaders={...headers,'Content-Type':'application/json'};

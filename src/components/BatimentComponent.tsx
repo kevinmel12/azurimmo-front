@@ -7,6 +7,8 @@ import AddBatimentComponent from "@/components/AddBatimentComponent";
 import HttpService from "@/services/HttpService";
 import API_URL from "@/constants/ApiUrl";
 import {DeleteOutlined, EditOutlined} from "@ant-design/icons";
+import '@ant-design/v5-patch-for-react-19';
+
 
 export default function BatimentComponent({...props}:{batiments:Batiment[]}) {
     const [batiments, setBatiments] = useState<Batiment[]>(props.batiments);
