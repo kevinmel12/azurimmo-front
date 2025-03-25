@@ -30,6 +30,10 @@ export  default class HttpService{
         const response=await fetch(url,{
             method:'DELETE'
         });
+
+        if (response.status === 204){
+            return true;
+        }
         return await response.json();
     }
 }

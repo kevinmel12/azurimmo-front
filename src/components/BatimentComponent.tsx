@@ -1,13 +1,14 @@
 "use client";
-import Batiment from "@/models/Batiment";
+import '@ant-design/v5-patch-for-react-19';
+import { useState } from "react";
 import Link from "next/link";
-import {useState} from "react";
-import {Button, Table, Tag} from "antd";
+import { Button, Table, Tag, Modal, message } from 'antd';
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import Batiment from "@/models/Batiment";
 import AddBatimentComponent from "@/components/AddBatimentComponent";
 import HttpService from "@/services/HttpService";
 import API_URL from "@/constants/ApiUrl";
-import {DeleteOutlined, EditOutlined} from "@ant-design/icons";
-import '@ant-design/v5-patch-for-react-19';
+
 
 
 export default function BatimentComponent({...props}:{batiments:Batiment[]}) {
@@ -18,6 +19,27 @@ export default function BatimentComponent({...props}:{batiments:Batiment[]}) {
         HttpService.post(API_URL.batiments,batiment).then((response)=>{
             setBatiments([...batiments,response]);
             setShowAddDialog(false);
+        });
+    };
+
+    const deleteBatiment= (id: number) => {
+        Modal.confirm({
+           title: 'Confirmation de suppression',
+            content: 'Êtes-vous sûr de vouloir supprimer ce bâtiment ?',
+            okText: 'Supprimer',
+            okType: 'danger',
+            cancelText: 'Annuler',
+            onOk() {
+               HttpService.delete(`${API_URL.batiments}${id}`)
+                   .then(()=>{
+                       setBatiments(batiments.filter(batiment => batiment.id !== id));
+                       message.success('Bâtiment supprimé avec succès');
+                   })
+                   .catch(error=>{
+                       console.error("Erreur lors de la suppression:", error);
+                       message.error('Erreur lors de la suppression du bâtiment');
+                   });
+            }
         });
     };
 
@@ -40,11 +62,12 @@ export default function BatimentComponent({...props}:{batiments:Batiment[]}) {
             key:'action',
             render:(text:string,record:Batiment)=>(
                 <>
-                    <Button shape={"circle"} onClick={()=>{
-                        console.log('record',record);
+                    <Button shape={"circle"} onClick={() => {
+                        console.log('Édition du bâtiment:', record);
                     }}><EditOutlined /></Button>
-                    <Button shape={"circle"} onClick={()=>{
-                        console.log('record',record);
+
+                    <Button shape={"circle"} onClick={() => {
+                        deleteBatiment(record.id);
                     }}><DeleteOutlined/></Button>
                 </>
             )
