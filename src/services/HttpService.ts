@@ -36,4 +36,14 @@ export  default class HttpService{
         }
         return await response.json();
     }
+
+    static async put(url:string,data:any,headers?: any){
+        const rHeaders={...headers,'Content-Type':'application/json'};
+        const response=await fetch(url,{
+            method:'PUT',
+            headers:rHeaders,
+            body:JSON.stringify(data)
+        });
+        return await response.json();
+    }
 }

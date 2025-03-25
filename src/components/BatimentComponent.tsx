@@ -23,7 +23,7 @@ export default function BatimentComponent({...props}:{batiments:Batiment[]}) {
 
     const saveBatiment = (batiment: Batiment) => {
         if (batiment.id) {
-            HttpService.post(`${API_URL.batiments}${batiment.id}`, batiment)
+            HttpService.put(`${API_URL.batiments}${batiment.id}`, batiment)
                 .then(response => {
                     setBatiments(batiments.map(item =>
                     item.id === batiment.id ? response : item
