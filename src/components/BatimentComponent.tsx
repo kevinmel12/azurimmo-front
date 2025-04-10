@@ -1,6 +1,6 @@
 "use client";
 import '@ant-design/v5-patch-for-react-19';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button, Table, Tag, Modal, message } from 'antd';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
@@ -9,12 +9,20 @@ import AddBatimentComponent from "@/components/AddBatimentComponent";
 import HttpService from "@/services/HttpService";
 import API_URL from "@/constants/ApiUrl";
 
-
-
 export default function BatimentComponent({...props}:{batiments:Batiment[]}) {
-    const [batiments, setBatiments] = useState<Batiment[]>(props.batiments);
+    // Ajout de console.log pour déboguer
+    console.log('Batiments reçus:', props.batiments);
+
+    const [batiments, setBatiments] = useState<Batiment[]>([]);
     const [showAddDialog, setShowAddDialog] = useState<boolean>(false);
     const [currentBatiment, setCurrentBatiment] = useState<Batiment | null>(null);
+
+    // Initialiser l'état avec les props reçues
+    useEffect(() => {
+        if (props.batiments && Array.isArray(props.batiments)) {
+            setBatiments(props.batiments);
+        }
+    }, [props.batiments]);
 
     const editBatiment = (batiment: Batiment) => {
         setCurrentBatiment(batiment);
@@ -26,16 +34,16 @@ export default function BatimentComponent({...props}:{batiments:Batiment[]}) {
             HttpService.put(`${API_URL.batiments}${batiment.id}`, batiment)
                 .then(response => {
                     setBatiments(batiments.map(item =>
-                    item.id === batiment.id ? response : item
+                        item.id === batiment.id ? response : item
                     ));
                     setShowAddDialog(false);
                     setCurrentBatiment(null);
                     message.success("Bâtiment mis à jour avec succès");
                 })
-            .catch(error => {
-                console.log("Erreur lors de la mise à jour:", error);
-                message.error('Erreur lors de la mise à jour du bâtiment');
-            });
+                .catch(error => {
+                    console.log("Erreur lors de la mise à jour:", error);
+                    message.error('Erreur lors de la mise à jour du bâtiment');
+                });
         } else {
             updateBatiment(batiment);
         }
@@ -50,30 +58,40 @@ export default function BatimentComponent({...props}:{batiments:Batiment[]}) {
 
     const deleteBatiment= (id: number) => {
         Modal.confirm({
-           title: 'Confirmation de suppression',
+            title: 'Confirmation de suppression',
             content: 'Êtes-vous sûr de vouloir supprimer ce bâtiment ?',
             okText: 'Supprimer',
             okType: 'danger',
             cancelText: 'Annuler',
             onOk() {
-               HttpService.delete(`${API_URL.batiments}${id}`)
-                   .then(()=>{
-                       setBatiments(batiments.filter(batiment => batiment.id !== id));
-                       message.success('Bâtiment supprimé avec succès');
-                   })
-                   .catch(error=>{
-                       console.error("Erreur lors de la suppression:", error);
-                       message.error('Erreur lors de la suppression du bâtiment');
-                   });
+                HttpService.delete(`${API_URL.batiments}${id}`)
+                    .then(()=>{
+                        setBatiments(batiments.filter(batiment => batiment.id !== id));
+                        message.success('Bâtiment supprimé avec succès');
+                    })
+                    .catch(error=>{
+                        console.error("Erreur lors de la suppression:", error);
+                        message.error('Erreur lors de la suppression du bâtiment');
+                    });
             }
         });
     };
 
+    // Pour mieux déboguer, affichons la première donnée si elle existe
+    if (batiments.length > 0) {
+        console.log('Premier bâtiment:', batiments[0]);
+    }
+
     const batColumns=[
+        {
+            title:'ID',
+            dataIndex:'id',
+            key:'id',
+        },
         {
             title:'Adresse',
             dataIndex:'adresse',
-            key:'adresse'
+            key:'adresse',
         },
         {
             title:'Ville',
@@ -86,7 +104,7 @@ export default function BatimentComponent({...props}:{batiments:Batiment[]}) {
         {
             title:'Actions',
             key:'action',
-            render:(text:string,record:Batiment)=>(
+            render:(_:string,record:Batiment)=>(
                 <>
                     <Button shape={"circle"} onClick={() => {
                         editBatiment(record);
@@ -104,6 +122,7 @@ export default function BatimentComponent({...props}:{batiments:Batiment[]}) {
         <>
             <h2>Bâtiments</h2>
             <Button onClick={()=>{
+                setCurrentBatiment(new Batiment());
                 setShowAddDialog(true);
             }}>Ajouter...</Button><br/>
             {showAddDialog &&
@@ -114,10 +133,22 @@ export default function BatimentComponent({...props}:{batiments:Batiment[]}) {
                         setCurrentBatiment(null);
                     }}
                     onSubmit={saveBatiment}
-            />}
+                />}
             <Link href={"/"}><Button>Retour à l'accueil</Button></Link>
-            {!showAddDialog && <>
-                <Table dataSource={batiments} rowKey={"id"} columns={batColumns}/>
-            </>}
-        </>);
+            {!showAddDialog && (
+                <>
+                    {/* Ajout d'informations de débogage */}
+                    <div style={{ margin: '10px 0', padding: '10px', backgroundColor: '#f5f5f5', border: '1px solid #ddd' }}>
+                        <p>Nombre de bâtiments: {batiments.length}</p>
+                    </div>
+
+                    <Table
+                        dataSource={batiments}
+                        rowKey="id"
+                        columns={batColumns}
+                    />
+                </>
+            )}
+        </>
+    );
 }
