@@ -6,6 +6,6 @@ export default class Appartement {
     surface: number = 0;
     nbPieces: number = 0;
     description: string = "";
-    //batiment: Batiment = new Batiment();
-    batiment: Batiment | null = null;
+    batiment: Batiment = new Batiment();
+
 }

@@ -23,6 +23,7 @@ export default function ContratComponent({...props}:{contrats:Contrat[]}) {
 
     const saveContrat = (contrat: Contrat) => {
         if (contrat.id) {
+            // Mise à jour d'un contrat existant
             HttpService.put(`${API_URL.contrats}${contrat.id}`, contrat)
                 .then(response => {
                     setContrats(contrats.map(item =>
@@ -37,18 +38,19 @@ export default function ContratComponent({...props}:{contrats:Contrat[]}) {
                     message.error('Erreur lors de la mise à jour du contrat');
                 });
         } else {
-            updateContrat(contrat);
+            // Création d'un nouveau contrat
+            HttpService.post(API_URL.contrats, contrat)
+                .then((response) => {
+                    setContrats([...contrats, response]);
+                    setShowAddDialog(false);
+                    setCurrentContrat(null);
+                    message.success("Contrat créé avec succès");
+                })
+                .catch(error => {
+                    console.error("Erreur lors de la création:", error);
+                    message.error('Erreur lors de la création du contrat');
+                });
         }
-    };
-
-    const updateContrat = (contrat: Contrat) => {
-        HttpService.post(API_URL.contrats, contrat).then((response) => {
-            setContrats([...contrats, response]);
-            setShowAddDialog(false);
-        }).catch(error => {
-            console.error("Erreur lors de la création:", error);
-            message.error('Erreur lors de la création du contrat');
-        });
     };
 
     const deleteContrat = (id: number) => {
@@ -75,18 +77,21 @@ export default function ContratComponent({...props}:{contrats:Contrat[]}) {
     const contratColumns = [
         {
             title: 'Locataire',
-            dataIndex: ['locataire', 'nom'],
             key: 'locataire',
-            /*render: (_: string, record: Contrat) => (
-                <span>{record.locataire?.nom} {record.locataire?.prenom}</span>
-            )*/
+            render: (_: string, record: Contrat) => (
+                <span>
+                    {record.locataire ? `${record.locataire.nom} ${record.locataire.prenom}` : '-'}
+                </span>
+            )
         },
         {
             title: 'Appartement',
             key: 'appartement',
             render: (_: string, record: Contrat) => (
                 <span>
-                    {record.appartement?.batiment?.adresse} - N°{record.appartement?.numero}
+                    {record.appartement && record.appartement.batiment
+                        ? `${record.appartement.batiment.adresse} - N°${record.appartement.numero}`
+                        : '-'}
                 </span>
             )
         },
@@ -95,7 +100,7 @@ export default function ContratComponent({...props}:{contrats:Contrat[]}) {
             dataIndex: 'dateEntree',
             key: 'dateEntree',
             render: (date: string) => (
-                <span>{dayjs(date).format('DD/MM/YYYY')}</span>
+                date ? <span>{dayjs(date).format('DD/MM/YYYY')}</span> : <span>-</span>
             )
         },
         {
@@ -127,7 +132,9 @@ export default function ContratComponent({...props}:{contrats:Contrat[]}) {
             dataIndex: 'statut',
             key: 'statut',
             render: (statut: string) => (
-                <Tag color={statut === 'Actif' ? 'green' : 'red'}>{statut}</Tag>
+                <Tag color={statut === 'Actif' ? 'green' : statut === 'Résilié' ? 'red' : 'orange'}>
+                    {statut}
+                </Tag>
             )
         },
         {
@@ -152,6 +159,7 @@ export default function ContratComponent({...props}:{contrats:Contrat[]}) {
             <h2>Contrats de location</h2>
             <Space style={{ marginBottom: 16 }}>
                 <Button type="primary" onClick={() => {
+                    setCurrentContrat(null);
                     setShowAddDialog(true);
                 }}>Ajouter un contrat</Button>
                 <Link href={"/"}><Button>Retour à l'accueil</Button></Link>

@@ -4,6 +4,7 @@ const API_URL = {
     batiments: `${API_BASE}batiments/`,
     appartements: `${API_BASE}appartements/`,
     contrats: `${API_BASE}contrats/`,
+    locataires: `${API_BASE}locataires/`,
 };
 
 export default API_URL;
