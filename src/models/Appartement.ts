@@ -7,5 +7,4 @@ export default class Appartement {
     nbPieces: number = 0;
     description: string = "";
     batiment: Batiment = new Batiment();
-
 }

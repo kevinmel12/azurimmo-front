@@ -165,15 +165,21 @@ export default function ContratComponent({...props}:{contrats:Contrat[]}) {
                 <Link href={"/"}><Button>Retour à l'accueil</Button></Link>
             </Space>
 
-            {showAddDialog &&
-                <AddContratComponent
-                    contrat={currentContrat || new Contrat()}
-                    onClose={() => {
-                        setShowAddDialog(false);
-                        setCurrentContrat(null);
-                    }}
-                    onSubmit={saveContrat}
-                />}
+            {showAddDialog && (
+                <div className="mb-6 p-4 border rounded-lg bg-white">
+                    <h3 className="text-lg font-semibold mb-2">
+                        {currentContrat && currentContrat.id ? 'Modifier le contrat' : 'Ajouter un contrat'}
+                    </h3>
+                    <AddContratComponent
+                        contrat={currentContrat || new Contrat()}
+                        onClose={() => {
+                            setShowAddDialog(false);
+                            setCurrentContrat(null);
+                        }}
+                        onSubmit={saveContrat}
+                    />
+                </div>
+            )}
 
             {!showAddDialog && (
                 <Table

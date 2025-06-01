@@ -36,7 +36,7 @@ export default function RootLayout({
           <Content className={"p-8 height-full"}>
             {children}
           </Content>
-          <Footer>Azurimmo ©2021 Created by Azurimmo</Footer>
+          <Footer>Azurimmo ©2025 Created by Azurimmo Digital</Footer>
       </Layout>
       </body>
     </html>

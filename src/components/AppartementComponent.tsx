@@ -2,7 +2,7 @@
 import '@ant-design/v5-patch-for-react-19';
 import { useState } from "react";
 import Link from "next/link";
-import { Button, Table, Modal, message, Tag } from 'antd';
+import {Button, Table, Modal, message, Tag, Space} from 'antd';
 import { DeleteOutlined, EditOutlined, HomeOutlined } from '@ant-design/icons';
 import Appartement from "@/models/Appartement";
 import AddAppartementComponent from "@/components/AddAppartementComponent";
@@ -114,23 +114,15 @@ export default function AppartementComponent({...props}: {appartements: Appartem
             title: 'Actions',
             key: 'action',
             render: (_: string, record: Appartement) => (
-                <div className="space-x-2">
-                    <Button
-                        shape="circle"
-                        onClick={() => editAppartement(record)}
-                        title="Modifier"
-                    >
-                        <EditOutlined />
-                    </Button>
-                    <Button
-                        shape="circle"
-                        danger
-                        onClick={() => deleteAppartement(record.id)}
-                        title="Supprimer"
-                    >
-                        <DeleteOutlined />
-                    </Button>
-                </div>
+                <Space>
+                    <Button shape={"circle"} onClick={() => {
+                        editAppartement(record);
+                    }}><EditOutlined /></Button>
+
+                    <Button shape={"circle"} onClick={() => {
+                        deleteAppartement(record.id);
+                    }}><DeleteOutlined /></Button>
+                </Space>
             )
         }
     ];
@@ -167,12 +159,14 @@ export default function AppartementComponent({...props}: {appartements: Appartem
                 </div>
             )}
 
-            <Table
-                dataSource={appartements}
-                columns={appartementColumns}
-                rowKey="id"
-                pagination={{ pageSize: 10 }}
-            />
+                {!showAddDialog && (
+                <Table
+                    dataSource={appartements}
+                    columns={appartementColumns}
+                    rowKey="id"
+                    pagination={{ pageSize: 10 }}
+                />
+            )}
         </>
     );
 }

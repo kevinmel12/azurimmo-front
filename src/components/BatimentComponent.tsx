@@ -2,7 +2,7 @@
 import '@ant-design/v5-patch-for-react-19';
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Button, Table, Tag, Modal, message } from 'antd';
+import { Button, Table, Tag, Modal, message, Space } from 'antd';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import Batiment from "@/models/Batiment";
 import AddBatimentComponent from "@/components/AddBatimentComponent";
@@ -10,9 +10,6 @@ import HttpService from "@/services/HttpService";
 import API_URL from "@/constants/ApiUrl";
 
 export default function BatimentComponent({...props}:{batiments:Batiment[]}) {
-    // Ajout de console.log pour déboguer
-    console.log('Batiments reçus:', props.batiments);
-
     const [batiments, setBatiments] = useState<Batiment[]>([]);
     const [showAddDialog, setShowAddDialog] = useState<boolean>(false);
     const [currentBatiment, setCurrentBatiment] = useState<Batiment | null>(null);
@@ -53,6 +50,10 @@ export default function BatimentComponent({...props}:{batiments:Batiment[]}) {
         HttpService.post(API_URL.batiments,batiment).then((response)=>{
             setBatiments([...batiments,response]);
             setShowAddDialog(false);
+            message.success("Bâtiment ajouté avec succès");
+        }).catch(error => {
+            console.error("Erreur lors de la création:", error);
+            message.error('Erreur lors de la création du bâtiment');
         });
     };
 
@@ -77,11 +78,6 @@ export default function BatimentComponent({...props}:{batiments:Batiment[]}) {
         });
     };
 
-    // Pour mieux déboguer, affichons la première donnée si elle existe
-    if (batiments.length > 0) {
-        console.log('Premier bâtiment:', batiments[0]);
-    }
-
     const batColumns=[
         {
             title:'ID',
@@ -105,7 +101,7 @@ export default function BatimentComponent({...props}:{batiments:Batiment[]}) {
             title:'Actions',
             key:'action',
             render:(_:string,record:Batiment)=>(
-                <>
+                <Space>
                     <Button shape={"circle"} onClick={() => {
                         editBatiment(record);
                     }}><EditOutlined /></Button>
@@ -113,41 +109,53 @@ export default function BatimentComponent({...props}:{batiments:Batiment[]}) {
                     <Button shape={"circle"} onClick={() => {
                         deleteBatiment(record.id);
                     }}><DeleteOutlined/></Button>
-                </>
+                </Space>
             )
         }
     ];
 
     return (
         <>
-            <h2>Bâtiments</h2>
-            <Button onClick={()=>{
-                setCurrentBatiment(new Batiment());
-                setShowAddDialog(true);
-            }}>Ajouter...</Button><br/>
-            {showAddDialog &&
-                <AddBatimentComponent
-                    batiment={currentBatiment || new Batiment()}
-                    onClose={() => {
-                        setShowAddDialog(false);
-                        setCurrentBatiment(null);
-                    }}
-                    onSubmit={saveBatiment}
-                />}
-            <Link href={"/"}><Button>Retour à l'accueil</Button></Link>
-            {!showAddDialog && (
-                <>
-                    {/* Ajout d'informations de débogage */}
-                    <div style={{ margin: '10px 0', padding: '10px', backgroundColor: '#f5f5f5', border: '1px solid #ddd' }}>
-                        <p>Nombre de bâtiments: {batiments.length}</p>
-                    </div>
+            <h2 className="text-2xl font-bold mb-4">Bâtiments</h2>
 
-                    <Table
-                        dataSource={batiments}
-                        rowKey="id"
-                        columns={batColumns}
+            <div className="mb-4 space-x-2">
+                <Button
+                    type="primary"
+                    onClick={()=>{
+                        setCurrentBatiment(new Batiment());
+                        setShowAddDialog(true);
+                    }}
+                >
+                    Ajouter un bâtiment
+                </Button>
+                <Link href="/">
+                    <Button>Retour à l'accueil</Button>
+                </Link>
+            </div>
+
+            {showAddDialog && (
+                <div className="mb-6 p-4 border rounded-lg bg-white">
+                    <h3 className="text-lg font-semibold mb-2">
+                        {currentBatiment && currentBatiment.id ? 'Modifier le bâtiment' : 'Ajouter un bâtiment'}
+                    </h3>
+                    <AddBatimentComponent
+                        batiment={currentBatiment || new Batiment()}
+                        onClose={() => {
+                            setShowAddDialog(false);
+                            setCurrentBatiment(null);
+                        }}
+                        onSubmit={saveBatiment}
                     />
-                </>
+                </div>
+            )}
+
+            {!showAddDialog && (
+                <Table
+                    dataSource={batiments}
+                    rowKey="id"
+                    columns={batColumns}
+                    pagination={{ pageSize: 10 }}
+                />
             )}
         </>
     );
